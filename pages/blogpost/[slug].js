@@ -1,26 +1,46 @@
-import React from 'react'
-import { useRouter } from 'next/router'
-import styles from '../../styles/BlogPost.module.css'
+import React from "react";
+import styles from "../../styles/BlogPost.module.css";
+import { useState } from "react";
+import * as fs from "fs";
 
 // Step1: Find the file corresponding to the slug
 // Step2: Populate them inside the page
-const slug = () => {
-    const router  = useRouter();
-    const {slug} = router.query
+const Slug = (props) => {
+  const [blog, setBlog] = useState(props.myBlog);
+
   return (
     <div className={styles.container}>
       <main className={styles.main}>
-      <h1>Title of the page {slug}</h1>
-      <hr />
-      <div>
-        <p>Lorem ipsum dolor, sit amet consectetur adipisicing elit. Quasi non nisi labore nihil molestias iste harum soluta, provident ea corrupti at, velit in.
-        Lorem ipsum dolor sit amet consectetur adipisicing elit. Provident officia molestias</p> 
-        <p>sequi inventore culpa eum repellat quo nulla temporibus vitae hic nisi iste odit necessitatibus quaerat consequuntur ratione voluptate labore, ea eos laboriosam, velit accusantium obcaecati molestiae. Ipsam magnam ut quidem, nobis cupiditate ratione velit
-        </p>
-      </div>
+        <h1>{blog && blog.title}</h1>
+        <hr />
+        <div>
+          <p>{blog && blog.content}</p>
+        </div>
       </main>
     </div>
-  )
+  );
 };
 
-export default slug
+export async function getStaticPaths() {
+  return {
+    paths: [
+      { params: { slug: "how-to-learn-flask" } },
+      { params: { slug: "how-to-learn-javascript" } },
+      { params: { slug: "how-to-learn-nextjs" } },
+    ],
+    fallback: true, // false or 'blocking'
+  };
+}
+
+export async function getStaticProps(context) {
+  const { slug } = context.params;
+
+  let myBlog = await fs.promises.readFile(`blogdata/${slug}.json`, "utf-8");
+  // console.log(slug)
+  // console.log(myBlog)
+  return {
+    props: { myBlog: JSON.parse(myBlog) }, // will be passed to the page component as props
+  };
+}
+
+export default Slug;
