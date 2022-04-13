@@ -6,6 +6,9 @@ import * as fs from "fs";
 // Step1: Find the file corresponding to the slug
 // Step2: Populate them inside the page
 const Slug = (props) => {
+  function createMarkup(c) {
+    return {__html: c};
+  }
   const [blog, setBlog] = useState(props.myBlog);
 
   return (
@@ -13,9 +16,7 @@ const Slug = (props) => {
       <main className={styles.main}>
         <h1>{blog && blog.title}</h1>
         <hr />
-        <div>
-          <p>{blog && blog.content}</p>
-        </div>
+        {blog && <div dangerouslySetInnerHTML={createMarkup(blog.content)}></div>}
       </main>
     </div>
   );
